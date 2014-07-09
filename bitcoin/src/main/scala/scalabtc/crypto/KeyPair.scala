@@ -3,6 +3,6 @@ package scalabtc.crypto
 /** A pair of public and private keys. */
 case class KeyPair(publicKey: PublicKey, privateKey: PrivateKey) {
 
-  /** The address from this key pair. */
-  lazy val address: Address = publicKey.address
+  /** Calculate the address of this keypair in the given network.  */
+  def toAddress(network: NetworkId): Address = publicKey.toAddress(network)
 }

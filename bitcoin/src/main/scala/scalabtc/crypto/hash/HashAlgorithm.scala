@@ -12,6 +12,9 @@ trait HashAlgorithm {
   /** Indicate whether the given hash length is valid for this algorithm. */
   def isValidHashLength(length: Int): Boolean
 
+  /** Create a hash of a hash using this algorithm. */
+  def apply(hash: Hash[_]): Hash[this.type ] = apply(hash.data)
+
   /** Create a new hash using this algorithm. */
   def apply(contents: BinaryData): Hash[this.type]
 

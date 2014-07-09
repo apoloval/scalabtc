@@ -23,6 +23,16 @@ class BinaryData(bytes: Array[Byte]) {
   }
 
   override def hashCode(): Int = toBigInt.hashCode()
+
+
+  override def toString = toHexString
+
+  def ++ (otherData: BinaryData): BinaryData = new BinaryData(bytes ++ otherData.toByteArray)
+  def :+ (byte: Byte): BinaryData = new BinaryData(bytes ++ Array(byte))
+  def +: (byte: Byte): BinaryData = new BinaryData(Array(byte) ++ bytes)
+
+  def take(n: Int): BinaryData = new BinaryData(bytes.take(n))
+  def drop(n: Int): BinaryData = new BinaryData(bytes.drop(n))
 }
 
 object BinaryData {

@@ -1,5 +1,7 @@
 package scalabtc.crypto
 
-class Address(bytes: Array[Byte]) {
+import scalabtc.crypto.util.BinaryData
+
+class Address(val data: BinaryData) {
 
 }
