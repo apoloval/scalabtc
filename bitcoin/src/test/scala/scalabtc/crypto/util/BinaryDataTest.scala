@@ -28,4 +28,15 @@ class BinaryDataTest extends FlatSpec with Matchers {
   it must "be converted into hex string" in {
     d1.toHexString should be ("010305")
   }
+
+  it must "be converted from hex string" in {
+    BinaryData.fromHexString("010305") should be (d1)
+    BinaryData.fromHexString("10305") should be (d1)
+  }
+
+  it must "fail to be converted from invalid hex string" in {
+    an[IllegalArgumentException] should be thrownBy { BinaryData.fromHexString("I'm YOUR father") }
+    an[IllegalArgumentException] should be thrownBy { BinaryData.fromHexString("1030X") }
+    an[IllegalArgumentException] should be thrownBy { BinaryData.fromHexString("01 03 05") }
+  }
 }

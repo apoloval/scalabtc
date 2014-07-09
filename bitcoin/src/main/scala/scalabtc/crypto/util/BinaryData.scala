@@ -1,5 +1,7 @@
 package scalabtc.crypto.util
 
+import scala.util.control.NonFatal
+
 class BinaryData(bytes: Array[Byte]) {
 
   val length: Int = bytes.length
@@ -28,4 +30,16 @@ object BinaryData {
   def apply(number: BigInt): BinaryData = new BinaryData(number.toByteArray)
 
   def apply(bytes: Array[Byte]): BinaryData = new BinaryData(bytes)
+
+  def fromHexString(hexString: String): BinaryData = {
+    def parseHex(str: String): Byte = Integer.parseInt(str, 16).toByte
+
+    val normHexString = if (hexString.length % 2 == 0) hexString else s"0$hexString"
+    try { BinaryData(normHexString.grouped(2).map(parseHex).toArray) }
+    catch {
+      case NonFatal(e) =>
+        throw new IllegalArgumentException(
+          s"cannot convert hex string $hexString into a binary data object", e)
+    }
+  }
 }
