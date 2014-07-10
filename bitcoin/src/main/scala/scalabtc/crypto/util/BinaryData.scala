@@ -31,8 +31,11 @@ class BinaryData(bytes: Array[Byte]) {
   def :+ (byte: Byte): BinaryData = new BinaryData(bytes ++ Array(byte))
   def +: (byte: Byte): BinaryData = new BinaryData(Array(byte) ++ bytes)
 
+  def head: Byte = bytes.head
   def take(n: Int): BinaryData = new BinaryData(bytes.take(n))
+  def takeRight(n: Int): BinaryData = new BinaryData(bytes.takeRight(n))
   def drop(n: Int): BinaryData = new BinaryData(bytes.drop(n))
+  def dropRight(n: Int): BinaryData = new BinaryData(bytes.dropRight(n))
 }
 
 object BinaryData {

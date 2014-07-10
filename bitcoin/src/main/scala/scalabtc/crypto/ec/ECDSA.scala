@@ -8,7 +8,7 @@ import org.spongycastle.crypto.AsymmetricCipherKeyPair
 import org.spongycastle.crypto.generators.ECKeyPairGenerator
 import org.spongycastle.crypto.params.{ECDomainParameters, ECKeyGenerationParameters, ECPrivateKeyParameters}
 import org.spongycastle.crypto.signers.ECDSASigner
-import org.spongycastle.math.ec.ECPoint
+import org.spongycastle.math.ec.{ECFieldElement, ECPoint}
 
 import scalabtc.crypto.Signature
 import scalabtc.crypto.hash.Sha256Hash
@@ -22,6 +22,11 @@ private [crypto] object ECDSA {
   private val halfCurveOrder = params.getN.shiftRight(1)
   private val secureRandom = new SecureRandom
 
+  def isValidPrivateKeyRange(privateKey: BinaryData): Boolean = {
+    val intData = privateKey.toBigInt
+    intData > curve.getH && intData < curve.getN
+  }
+
   def createPrivateKey(): BinaryData = {
     val keyPair = ECDSA.createKeyPair()
     val privateKeyParams = keyPair.getPrivate.asInstanceOf[ECPrivateKeyParameters]
@@ -31,10 +36,13 @@ private [crypto] object ECDSA {
   def createPublicKey(privateKey: BinaryData, isCompressed: Boolean): BinaryData = {
     var point: ECPoint = ECDSA.curve.getG.multiply(privateKey.toBigInt.bigInteger)
     if (isCompressed) {
-      point = ECDSA.compressPoint(point)
+      point = compressPoint(point)
     }
     BinaryData(point.getEncoded)
   }
+
+  def compressPublicKey(publicKey: BinaryData): BinaryData =
+    BinaryData(compressPoint(decodePoint(publicKey)).getEncoded)
 
   def sign(input: Sha256Hash, privateKey: BinaryData): Signature = {
     val signer = new ECDSASigner
@@ -47,6 +55,9 @@ private [crypto] object ECDSA {
   private def compressPoint(uncompressed: ECPoint): ECPoint = {
     new ECPoint.Fp(curve.getCurve, uncompressed.getX, uncompressed.getY, true)
   }
+
+  private def decodePoint(data: BinaryData): ECPoint =
+    curve.getCurve.decodePoint(data.toByteArray)
 
   private def createGenerator(): ECKeyPairGenerator = {
     val generator = new ECKeyPairGenerator

@@ -52,11 +52,23 @@ class BinaryDataTest extends FlatSpec with Matchers {
     (10: Byte) +: d1 should be (BinaryData(Array[Byte](10, 1, 3, 5)))
   }
 
+  it must "retrieve head" in {
+    d1.head should be (1.toByte)
+  }
+
   it must "take n first bytes" in {
     d1.take(2) should be (BinaryData(Array[Byte](1, 3)))
   }
 
+  it must "take right n last bytes" in {
+    d1.takeRight(2) should be (BinaryData(Array[Byte](3, 5)))
+  }
+
   it must "drop n first bytes" in {
     d1.drop(2) should be (BinaryData(Array[Byte](5)))
+  }
+
+  it must "drop right n last bytes" in {
+    d1.dropRight(2) should be (BinaryData(Array[Byte](1)))
   }
 }
