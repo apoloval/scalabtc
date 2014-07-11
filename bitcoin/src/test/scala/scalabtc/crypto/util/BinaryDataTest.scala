@@ -26,12 +26,21 @@ class BinaryDataTest extends FlatSpec with Matchers {
   }
 
   it must "be converted into hex string" in {
-    d1.toHexString should be ("010305")
+    d1.toHexString should be ("10305")
+  }
+
+  it must "be converted into base58 string" in {
+    d1.toBase58String should be ("LiG")
   }
 
   it must "be converted from hex string" in {
     BinaryData.fromHexString("010305") should be (d1)
     BinaryData.fromHexString("10305") should be (d1)
+  }
+
+  it must "be converted from base58 string" in {
+    BinaryData.fromBase58String("LiG") should be (d1)
+    BinaryData.fromBase58String("1LiG") should be (d1)
   }
 
   it must "fail to be converted from invalid hex string" in {
@@ -70,5 +79,9 @@ class BinaryDataTest extends FlatSpec with Matchers {
 
   it must "drop right n last bytes" in {
     d1.dropRight(2) should be (BinaryData(Array[Byte](1)))
+  }
+
+  it must "drop while bytes" in {
+    d1.dropWhile(b => b == 1) should be (BinaryData(Array[Byte](3, 5)))
   }
 }

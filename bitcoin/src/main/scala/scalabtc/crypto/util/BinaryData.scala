@@ -1,6 +1,7 @@
 package scalabtc.crypto.util
 
 import scala.util.control.NonFatal
+import scalabtc.crypto.encoding.{Base58, Base16}
 
 class BinaryData(bytes: Array[Byte]) {
 
@@ -10,15 +11,14 @@ class BinaryData(bytes: Array[Byte]) {
 
   lazy val toBigInt: BigInt = BigInt(bytes)
 
-  lazy val toHexString: String = bytes.map { b =>
-    val s = Integer.toHexString(b & 0xFF)
-    if (s.size < 2) s"0$s" else s
-  }.mkString
+  lazy val toUnsignedBigInt: BigInt = BigInt(1, bytes)
+
+  lazy val toHexString: String = Base16.encode(this)
+
+  lazy val toBase58String: String = Base58.encode(this)
 
   override def equals(other: Any): Boolean = other match {
-    case data: BinaryData =>
-      val theirBytes = data.toByteArray
-      theirBytes.length == bytes.length && theirBytes.zip(bytes).forall(pair => pair._1 == pair._2)
+    case data: BinaryData => data.toBigInt == toBigInt
     case _ => false
   }
 
@@ -36,6 +36,7 @@ class BinaryData(bytes: Array[Byte]) {
   def takeRight(n: Int): BinaryData = new BinaryData(bytes.takeRight(n))
   def drop(n: Int): BinaryData = new BinaryData(bytes.drop(n))
   def dropRight(n: Int): BinaryData = new BinaryData(bytes.dropRight(n))
+  def dropWhile(f: Byte => Boolean) = new BinaryData(bytes.dropWhile(f))
 }
 
 object BinaryData {
@@ -44,15 +45,7 @@ object BinaryData {
 
   def apply(bytes: Array[Byte]): BinaryData = new BinaryData(bytes)
 
-  def fromHexString(hexString: String): BinaryData = {
-    def parseHex(str: String): Byte = Integer.parseInt(str, 16).toByte
+  def fromHexString(hexString: String): BinaryData = Base16.decode(hexString)
 
-    val normHexString = if (hexString.length % 2 == 0) hexString else s"0$hexString"
-    try { BinaryData(normHexString.grouped(2).map(parseHex).toArray) }
-    catch {
-      case NonFatal(e) =>
-        throw new IllegalArgumentException(
-          s"cannot convert hex string $hexString into a binary data object", e)
-    }
-  }
+  def fromBase58String(base58String: String): BinaryData = Base58.decode(base58String)
 }
